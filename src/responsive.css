@@ -1,0 +1,231 @@
+/**
+ * Estilos responsive y mejoras para dark mode
+ * Se aplican globalmente a todos los componentes
+ */
+
+/* ===== Variables CSS para tema ===== */
+:root {
+  --color-bg-light: #F2F4F7;
+  --color-bg-dark: #0f172a;
+  --color-text-light: #111827;
+  --color-text-dark: #f3f4f6;
+  --color-border-light: rgba(0, 182, 217, 0.2);
+  --color-border-dark: rgba(55, 65, 81, 1);
+}
+
+/* ===== Mejoras de responsividad ===== */
+
+/* Scrollbar mejorado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 182, 217, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 182, 217, 0.5);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
+}
+
+/* ===== Tablas responsivas ===== */
+@media (max-width: 640px) {
+  table {
+    font-size: 0.875rem; /* text-sm */
+  }
+
+  table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(0, 182, 217, 0.2);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  table th {
+    display: none;
+  }
+
+  table td {
+    display: block;
+    text-align: right;
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(0, 182, 217, 0.1);
+  }
+
+  table td:first-child {
+    text-align: left;
+  }
+
+  table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: 600;
+    color: rgba(0, 182, 217, 0.8);
+  }
+
+  html.dark table td::before {
+    color: rgba(59, 130, 246, 0.8);
+  }
+}
+
+/* ===== Formularios responsivos ===== */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .md\\:grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .md\\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .md\\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .md\\:col-span-2 {
+    grid-column: auto !important;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 2.75rem; /* 44px para touch */
+    font-size: 16px; /* Evita zoom en iOS */
+  }
+}
+
+/* ===== Botones responsivos ===== */
+@media (max-width: 640px) {
+  button,
+  .button,
+  label {
+    min-height: 2.75rem; /* 44px para touch */
+    min-width: 2.75rem;
+  }
+
+  .flex-wrap {
+    gap: 0.5rem;
+  }
+
+  button {
+    font-size: 0.875rem; /* text-sm */
+  }
+}
+
+/* ===== Flexbox responsivo ===== */
+@media (max-width: 768px) {
+  .md\\:flex-row {
+    flex-direction: column !important;
+  }
+
+  .gap-2 {
+    gap: 0.5rem;
+  }
+
+  .gap-3 {
+    gap: 0.75rem;
+  }
+
+  .gap-4 {
+    gap: 1rem;
+  }
+}
+
+/* ===== Espaciado responsivo ===== */
+@media (max-width: 640px) {
+  .p-6 {
+    padding: 1rem;
+  }
+
+  .px-6 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .py-6 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+/* ===== Modales responsivos ===== */
+@media (max-width: 640px) {
+  .md\\:max-w-4xl {
+    max-width: 100vw !important;
+  }
+
+  .rounded-2xl {
+    border-radius: 1rem;
+  }
+}
+
+/* ===== Overlay responsive ===== */
+.fixed.inset-0 {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* ===== Mejoras de accesibilidad ===== */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(0, 182, 217, 1);
+  outline-offset: 2px;
+}
+
+html.dark button:focus-visible,
+html.dark input:focus-visible,
+html.dark select:focus-visible,
+html.dark textarea:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 1);
+}
+
+/* ===== Transiciones suaves ===== */
+* {
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+html.dark {
+  color-scheme: dark;
+  background-color: #0f172a;
+}
+
+html.light {
+  color-scheme: light;
+  background-color: #F2F4F7;
+}
+
+/* ===== Fix para Safari iOS ===== */
+@supports (-webkit-touch-callout: none) {
+  input,
+  select,
+  textarea,
+  button {
+    font-size: 16px !important;
+  }
+}

@@ -1,0 +1,31 @@
+Requiero que modifiques lo siguiente en base a las utilidades pra permitir un mayor control y manejo del negocio por parte del propieterio. Comienza con lo siguiente:
+
+Barberos:
+    1. Se agrega barbero y aparece en módulo ventas pero no aparece más en barberos, por lo que debes revisar esa conexión y restaurarlo, que ya sea que se agregue desde modulo ventas o barbero, sea la misma tabla de datos barbero y que se muestre de la misma forma en ambos modulos
+    2. En reportes no muestra en cada venta, quien fue el barbero a cargo de la venta, debe mostrarlo
+    3. agregar pdf x fecha para mandar reporte de cuanto vendió cada barbero en determinado lapso de tiempo, establecido con las fechas . 
+Por ejemplo, de fecha 1/7 a día de hoy, tienen que salir todos los barberos agregados, y un listado de cortes, detallados y un total, para saber con exactitud el trabajo de cada barbero
+
+
+Cierre de caja:
+    Modificar cierre de caja con:
+        Total efectivo
+        Total transferencia
+        Total tarjeta y cheque
+        Que se sume cada total para verificar si el cierre es correcto
+        Y que el monto inicial del día siguiente sea un monto sin calcular en ningún lado, solo se agrega y ya
+        Por ejemplo: al momento de cierre de caja solo debe pedir los totales correspondientes, y revisar cada uno por individual (efectivo en caja, sumado al monto que habia al iniciar caja, con las ventas que fueron efectivo, transferencias con las ventas señaladas como transferencia y asi sucesivamente);
+        luego, al usuario mostrarle el detalle indiviual y el final (sumatoria y avisar si el cierre es correcto o si hay SOBRANTE o RESTANTE)
+        Ademas, permitir colocar alli, el monto de caja a iniciar al dia siguiente.
+        Es similar a la logica que ya tiene actualmente, pero simplificada para un uso mas practico.
+
+
+Contraste tema oscuro:
+    Ver contraste en tema oscuro, para clientes, barberos, reportes y en pdfs también, ya que en la version oscura hay muchos numeros, letras, y datos importantes que no se ven, porque esta mal ejecutado el modo oscuro. Solucionarlo
+
+
+Dashboard:
+    Sacar cajas activas de módulo Dashboard, como adjunto en la imagen
+
+
+
