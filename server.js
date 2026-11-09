@@ -1,16 +1,16 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const multer = require('multer');
 const fs = require('fs');
 const { createBackup } = require('./lib/backup');
 const { isService, stockMinimum } = require('./lib/product-utils');
+const { db, dbRun, dbGet, dbAll, isTurso, dbPath } = require('./lib/db');
 
 const app = express();
-const dbPath = path.join(__dirname, 'pos.db');
 
 // Crear carpeta de uploads
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -43,37 +43,8 @@ const upload = multer({
   }
 });
 
-// ===== CONFIGURACIÓN DE BD =====
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('[ERROR] Error al conectar BD:', err.message);
-    process.exit(1);
-  }
-  console.log('[OK] Conectado a SQLite');
-  inicializarBD();
-});
-
-// Promisificar db functions
-const dbRun = (sql, params = []) => new Promise((resolve, reject) => {
-  db.run(sql, params, function(err) {
-    if (err) reject(err);
-    else resolve({ id: this.lastID, changes: this.changes });
-  });
-});
-
-const dbGet = (sql, params = []) => new Promise((resolve, reject) => {
-  db.get(sql, params, (err, row) => {
-    if (err) reject(err);
-    else resolve(row);
-  });
-});
-
-const dbAll = (sql, params = []) => new Promise((resolve, reject) => {
-  db.all(sql, params, (err, rows) => {
-    if (err) reject(err);
-    else resolve(rows || []);
-  });
-});
+// ===== INICIALIZACIÓN DE BD =====
+inicializarBD();
 
 function inicializarBD() {
   db.serialize(() => {
@@ -1453,10 +1424,8 @@ app.get('/api/cajas', verificarToken, async (req, res) => {
       sql += " WHERE c.estado = 'abierta'";
     }
     sql += " ORDER BY c.fecha_apertura DESC";
-    db.all(sql, (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows || []);
-    });
+    const rows = await dbAll(sql);
+    res.json(rows || []);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2221,10 +2190,8 @@ app.get('/api/reportes/stock-bajo', verificarToken, async (req, res) => {
 app.get('/api/ofertas', verificarToken, async (req, res) => {
   try {
     const sql = `SELECT * FROM ofertas ORDER BY fecha_creacion DESC LIMIT 50`;
-    db.all(sql, (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows || []);
-    });
+    const rows = await dbAll(sql);
+    res.json(rows || []);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2234,10 +2201,8 @@ app.post('/api/ofertas', verificarToken, async (req, res) => {
   try {
     const { nombre, descuento, fecha_inicio, fecha_fin } = req.body;
     const sql = `INSERT INTO ofertas (nombre, descuento, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, 'activa')`;
-    db.run(sql, [nombre, descuento, fecha_inicio, fecha_fin], function(err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID, nombre, descuento });
-    });
+    const result = await dbRun(sql, [nombre, descuento, fecha_inicio, fecha_fin]);
+    res.json({ id: result.id, nombre, descuento });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -2256,10 +2221,8 @@ app.delete('/api/ofertas/:id', verificarToken, async (req, res) => {
 app.get('/api/usuarios', verificarToken, async (req, res) => {
   try {
     const sql = `SELECT id, usuario, nombre, rol, email FROM usuarios WHERE activo = 1 ORDER BY usuario`;
-    db.all(sql, (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows || []);
-    });
+    const rows = await dbAll(sql);
+    res.json(rows || []);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

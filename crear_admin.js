@@ -1,9 +1,5 @@
-const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
-const path = require('path');
-
-const dbPath = path.join(__dirname, 'pos.db');
-const db = new sqlite3.Database(dbPath);
+const { dbRun, isTurso } = require('./lib/db');
 
 async function crearUsuariosIniciales() {
   const salt = await bcrypt.genSalt(10);
@@ -27,27 +23,22 @@ async function crearUsuariosIniciales() {
     }
   ];
 
-  const stmt = db.prepare(`
-    INSERT INTO usuarios (usuario, email, password, nombre, rol, activo)
-    VALUES (?, ?, ?, ?, ?, 1)
-  `);
+  for (const u of usuarios) {
+    try {
+      await dbRun(
+        `INSERT OR REPLACE INTO usuarios (usuario, email, password, nombre, rol, activo) VALUES (?, ?, ?, ?, ?, 1)`,
+        [u.usuario, u.email, u.password, u.nombre, u.rol]
+      );
+      console.log(`✅ Usuario creado/actualizado: ${u.usuario} (rol: ${u.rol})`);
+    } catch (err) {
+      console.error(`Error al crear ${u.usuario}:`, err.message);
+    }
+  }
 
-  usuarios.forEach(u => {
-    stmt.run([u.usuario, u.email, u.password, u.nombre, u.rol], (err) => {
-      if (err) {
-        console.error(`Error al crear ${u.usuario}:`, err.message);
-      } else {
-        console.log(`✅ Usuario creado: ${u.usuario} (rol: ${u.rol})`);
-      }
-    });
-  });
-
-  stmt.finalize(() => {
-    db.close();
-    console.log('\nCredenciales listas para iniciar sesión:');
-    console.log('• Admin: admin / admin123');
-    console.log('• Vendedor: vendedor / vendedor123');
-  });
+  console.log('\nCredenciales listas para iniciar sesión:');
+  console.log('• Admin: admin / admin123');
+  console.log('• Vendedor: vendedor / vendedor123');
+  process.exit(0);
 }
 
 crearUsuariosIniciales();

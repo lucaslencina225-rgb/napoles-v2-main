@@ -1,46 +1,41 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const { dbRun, isTurso, db } = require('./lib/db');
 
-const dbPath = path.join(__dirname, 'pos.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error abriendo pos.db:', err.message);
+const tables = [
+  'movimientos_puntos',
+  'movimientos_stock',
+  'movimientos_caja',
+  'items_venta',
+  'ventas',
+  'cajas',
+  'barberos',
+  'clientes',
+  'stock_sucursal',
+  'productos',
+  'sucursales',
+  'proveedores',
+  'marcas',
+  'categorias',
+  'sesiones',
+  'usuarios',
+  'ofertas'
+];
+
+async function limpiar() {
+  console.log(`Iniciando limpieza en ${isTurso ? 'Turso' : 'SQLite local'}...`);
+  try {
+    for (const table of tables) {
+      await dbRun(`DELETE FROM "${table}"`);
+    }
+    try {
+      await dbRun('DELETE FROM sqlite_sequence');
+    } catch (e) {}
+
+    console.log('✅ Base de datos limpiada exitosamente. Todas las tablas quedaron vacías y los autoincrementables reseteados a 0.');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error al limpiar la base de datos:', err.message);
     process.exit(1);
   }
-});
+}
 
-const sqlLimpieza = `
-  PRAGMA foreign_keys = OFF;
-  
-  DELETE FROM movimientos_puntos;
-  DELETE FROM movimientos_stock;
-  DELETE FROM movimientos_caja;
-  DELETE FROM items_venta;
-  DELETE FROM ventas;
-  DELETE FROM cajas;
-  DELETE FROM barberos;
-  DELETE FROM clientes;
-  DELETE FROM stock_sucursal;
-  DELETE FROM productos;
-  DELETE FROM sucursales;
-  DELETE FROM proveedores;
-  DELETE FROM marcas;
-  DELETE FROM categorias;
-  DELETE FROM sesiones;
-  DELETE FROM usuarios;
-  DELETE FROM ofertas;
-  
-  DELETE FROM sqlite_sequence;
-  VACUUM;
-  
-  PRAGMA foreign_keys = ON;
-`;
-
-db.exec(sqlLimpieza, (err) => {
-  if (err) {
-    console.error('Error al limpiar la base de datos:', err.message);
-  } else {
-    console.log('✅ pos.db limpiada exitosamente. Todas las tablas quedaron vacías y los autoincrementables reseteados a 0.');
-  }
-  db.close();
-});
+limpiar();
