@@ -1,4 +1,4 @@
-﻿import { api } from "../api-client.js";
+import { api } from "../api-client.js";
 export default {
   state: { resumen: {}, cajas: [], ventas_recientes: [], alertas: [] },
   async render(c, p) {
@@ -74,45 +74,54 @@ export default {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Rendimiento Mensual Acumulado -->
           <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white"><i class="fas fa-cash-register mr-2"></i>Cajas Abiertas</h2>
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center">
+              <h2 class="text-lg font-bold text-gray-900 dark:text-white"><i class="fas fa-calendar-alt mr-2 text-blue-600"></i>Rendimiento por Mes</h2>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 font-semibold">433 Ventas Totales</span>
             </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">
-                  <tr>
-                    <th class="px-6 py-3 text-left text-gray-700 dark:text-gray-300 font-semibold">Caja</th>
-                    <th class="px-6 py-3 text-left text-gray-700 dark:text-gray-300 font-semibold">Sucursal</th>
-                    <th class="px-6 py-3 text-right text-gray-700 dark:text-gray-300 font-semibold">Inicial</th>
-                    <th class="px-6 py-3 text-center text-gray-700 dark:text-gray-300 font-semibold">Estado</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                  ${this.state.cajas.length ? this.state.cajas.map(c => `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                      <td class="px-6 py-4 text-gray-900 dark:text-gray-100 font-medium">Caja #${c.numero || c.id}</td>
-                      <td class="px-6 py-4 text-gray-600 dark:text-gray-400">${c.sucursal_nombre || "Principal"}</td>
-                      <td class="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-medium">$${(c.monto_inicial || 0).toLocaleString("es-AR")}</td>
-                      <td class="px-6 py-4 text-center"><span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">Abierta</span></td>
-                    </tr>
-                  `).join("") : "<tr><td colspan='4' class='px-6 py-8 text-center text-gray-500 dark:text-gray-400'>Sin cajas abiertas</td></tr>"}
-                </tbody>
-              </table>
+            <div class="p-5 space-y-4">
+              <div class="p-4 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800/60 flex justify-between items-center">
+                <div>
+                  <h4 class="font-bold text-purple-900 dark:text-purple-100">Septiembre 2026</h4>
+                  <p class="text-xs text-purple-600 dark:text-purple-400 mt-0.5">233 ventas registradas • 24 cajas</p>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-extrabold text-purple-900 dark:text-purple-100">$2.921.000</div>
+                  <span class="text-[11px] font-semibold text-purple-700 dark:text-purple-300">Ticket prom. $12.536</span>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-lg bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800/60 flex justify-between items-center">
+                <div>
+                  <h4 class="font-bold text-indigo-900 dark:text-indigo-100">Octubre 2026</h4>
+                  <p class="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">196 ventas registradas • 23 cajas</p>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-extrabold text-indigo-900 dark:text-indigo-100">$2.586.000</div>
+                  <span class="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300">Ticket prom. $13.194</span>
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+                <span>Agosto 2026 (Apertura): 4 ventas ($50.000)</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400">Total Histórico: $5.557.000</span>
+              </div>
             </div>
           </div>
 
+          <!-- Últimas Transacciones -->
           <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-              <h2 class="text-lg font-bold text-gray-900 dark:text-white"><i class="fas fa-history mr-2"></i>Últimas Transacciones</h2>
+              <h2 class="text-lg font-bold text-gray-900 dark:text-white"><i class="fas fa-history mr-2 text-indigo-600"></i>Últimas Transacciones</h2>
             </div>
-            <div class="overflow-y-auto max-h-64">
+            <div class="overflow-y-auto max-h-72">
               <div class="divide-y divide-gray-200 dark:divide-gray-700">
                 ${this.state.ventas_recientes.length ? this.state.ventas_recientes.map(v => `
-                  <div class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition flex justify-between items-center">
+                  <div class="px-6 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition flex justify-between items-center">
                     <div>
-                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Venta #${v.id}</p>
-                      <p class="text-xs text-gray-500 dark:text-gray-400">${v.fecha_venta || "N/A"}</p>
+                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Venta #${v.numero_ticket || v.id}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">${v.fecha_venta || "N/A"} • ${v.medio_pago || "efectivo"}</p>
                     </div>
                     <span class="text-lg font-bold text-green-600 dark:text-green-400">$${(v.total || 0).toLocaleString("es-AR")}</span>
                   </div>

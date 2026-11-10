@@ -841,15 +841,24 @@ app.get('/api/clientes/:id', verificarToken, async (req, res) => {
 
     const ventas = await dbAll(sqlVentas, paramsVentas);
 
-    // Obtener items de cada venta
-    for (let venta of ventas) {
-      venta.items = await dbAll(
-        `SELECT iv.id, iv.cantidad, iv.precio_unitario, p.nombre as producto_nombre, p.sku
+    // Obtener items de todas las ventas en una sola consulta
+    if (ventas.length > 0) {
+      const vIds = ventas.map(v => v.id);
+      const allItems = await dbAll(
+        `SELECT iv.id, iv.venta_id, iv.cantidad, iv.precio_unitario, p.nombre as producto_nombre, p.sku
          FROM items_venta iv
          JOIN productos p ON iv.producto_id = p.id
-         WHERE iv.venta_id = ?`,
-        [venta.id]
+         WHERE iv.venta_id IN (${vIds.map(() => '?').join(',')})`,
+        vIds
       );
+      const itemsMap = new Map();
+      for (const it of allItems) {
+        if (!itemsMap.has(it.venta_id)) itemsMap.set(it.venta_id, []);
+        itemsMap.get(it.venta_id).push(it);
+      }
+      for (let venta of ventas) {
+        venta.items = itemsMap.get(venta.id) || [];
+      }
     }
 
     // Obtener productos consumidos por el cliente
@@ -984,7 +993,8 @@ app.post('/api/barberos', verificarToken, async (req, res) => {
       [nombre, apellido, email || null, telefono, documento_tipo || 'DNI', documento_numero || null, codigo]
     );
 
-    res.json({ id: result.id, codigo_barbero: codigo, mensaje: 'Barbero creado' });
+    const nuevoBarbero = await dbGet('SELECT * FROM barberos WHERE id = ?', [result.id]);
+    res.json(nuevoBarbero || { id: result.id, codigo_barbero: codigo, mensaje: 'Barbero creado' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -1002,12 +1012,13 @@ app.get('/api/barberos/:id', verificarToken, async (req, res) => {
       return res.status(404).json({ error: 'Barbero no encontrado' });
     }
 
-    // Si no hay rango de fechas, usar el día actual
-    if (!fecha_inicio || !fecha_fin) {
+    // Si no hay rango de fechas, abarcar todo el período por defecto
+    if (!fecha_inicio) {
+      fecha_inicio = '2026-01-01';
+    }
+    if (!fecha_fin) {
       const hoy = new Date();
-      const hoyStr = hoy.toISOString().split('T')[0];
-      fecha_inicio = hoyStr;
-      fecha_fin = hoyStr;
+      fecha_fin = hoy.toISOString().split('T')[0];
     }
 
     // Obtener historial de ventas del rango especificado
@@ -1026,15 +1037,24 @@ app.get('/api/barberos/:id', verificarToken, async (req, res) => {
 
     const ventas = await dbAll(sqlVentas, paramsVentas);
 
-    // Obtener items de cada venta
-    for (let venta of ventas) {
-      venta.items = await dbAll(
-        `SELECT iv.id, iv.cantidad, iv.precio_unitario, p.nombre as producto_nombre, p.sku
+    // Obtener items de todas las ventas en una sola consulta
+    if (ventas.length > 0) {
+      const vIds = ventas.map(v => v.id);
+      const allItems = await dbAll(
+        `SELECT iv.id, iv.venta_id, iv.cantidad, iv.precio_unitario, p.nombre as producto_nombre, p.sku
          FROM items_venta iv
          JOIN productos p ON iv.producto_id = p.id
-         WHERE iv.venta_id = ?`,
-        [venta.id]
+         WHERE iv.venta_id IN (${vIds.map(() => '?').join(',')})`,
+        vIds
       );
+      const itemsMap = new Map();
+      for (const it of allItems) {
+        if (!itemsMap.has(it.venta_id)) itemsMap.set(it.venta_id, []);
+        itemsMap.get(it.venta_id).push(it);
+      }
+      for (let venta of ventas) {
+        venta.items = itemsMap.get(venta.id) || [];
+      }
     }
 
     // Calcular estadísticas del rango de fechas

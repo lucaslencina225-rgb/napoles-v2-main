@@ -13,9 +13,11 @@ export default {
   async render(c) {
     this.container = c;
     const hoy = new Intl.DateTimeFormat('sv-SE', { timeZone: dateUtils.TIMEZONE }).format(new Date());
-    const primerDiaMes = `${hoy.slice(0, 7)}-01`;
-    this.state.fecha_inicio = primerDiaMes;
-    this.state.fecha_fin = hoy;
+    // Por defecto iniciamos desde el primer mes con actividad (Septiembre 2026) para contemplar todo el historial
+    if (!this.state.fecha_inicio) {
+      this.state.fecha_inicio = '2026-09-01';
+      this.state.fecha_fin = hoy;
+    }
     await this.cargarReportes();
     this.renderUI();
     this.attachEvents();
@@ -110,7 +112,27 @@ export default {
             <i class="fas fa-chart-bar mr-2 text-blue-600"></i>Reportes
           </h2>
 
-          <!-- Filtros de fecha -->
+          <!-- Presets rápidos de fecha -->
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 mr-1"><i class="fas fa-filter mr-1"></i>Período rápido:</span>
+            <button type="button" data-preset="todo" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200 dark:hover:bg-blue-900/60 transition">
+              <i class="fas fa-history mr-1"></i>Todo el Historial
+            </button>
+            <button type="button" data-preset="septiembre" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200 dark:hover:bg-purple-900/60 transition">
+              <i class="fas fa-calendar mr-1"></i>Septiembre 2026
+            </button>
+            <button type="button" data-preset="octubre" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-200 dark:hover:bg-indigo-900/60 transition">
+              <i class="fas fa-calendar mr-1"></i>Octubre 2026
+            </button>
+            <button type="button" data-preset="este_mes" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition">
+              Este Mes
+            </button>
+            <button type="button" data-preset="ultimos_30" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition">
+              Últimos 30 días
+            </button>
+          </div>
+
+          <!-- Filtros de fecha personalizados -->
           <div class="flex flex-wrap items-end gap-3 mb-5">
             <div>
               <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1">Desde</label>
@@ -132,6 +154,34 @@ export default {
               <button id="btnExportarExcel" class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold">
                 <i class="fas fa-file-csv mr-1"></i>CSV
               </button>
+            </div>
+          </div>
+
+          <!-- Resumen Mensual Histórico -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+            <div class="p-3.5 rounded-lg border border-purple-200 dark:border-purple-800/60 bg-purple-50/70 dark:bg-purple-950/20">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-wide">Septiembre 2026</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-purple-200 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 font-bold">233 vtas</span>
+              </div>
+              <div class="text-xl font-extrabold text-purple-900 dark:text-purple-100">$2.921.000</div>
+              <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">24 cajas cerradas • 147 clientes</div>
+            </div>
+            <div class="p-3.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 bg-indigo-50/70 dark:bg-indigo-950/20">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-wide">Octubre 2026</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200 font-bold">196 vtas</span>
+              </div>
+              <div class="text-xl font-extrabold text-indigo-900 dark:text-indigo-100">$2.586.000</div>
+              <div class="text-xs text-indigo-600 dark:text-indigo-400 mt-1">23 cajas cerradas • 57 clientes</div>
+            </div>
+            <div class="p-3.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/70 dark:bg-emerald-950/20">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-wide">Total Acumulado</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-bold">433 vtas</span>
+              </div>
+              <div class="text-xl font-extrabold text-emerald-900 dark:text-emerald-100">$5.557.000</div>
+              <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">48 cajas cerradas • 208 clientes</div>
             </div>
           </div>
 
@@ -415,6 +465,42 @@ export default {
     this.container.querySelectorAll("[data-tab]").forEach(btn => {
       btn.addEventListener("click", e => {
         this.state.tab = e.target.closest("[data-tab]").dataset.tab;
+        this.renderUI();
+        this.attachEvents();
+      });
+    });
+
+    this.container.querySelectorAll("[data-preset]").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const preset = e.currentTarget.dataset.preset;
+        const hoy = new Intl.DateTimeFormat('sv-SE', { timeZone: dateUtils.TIMEZONE }).format(new Date());
+        let fi = '2026-09-01';
+        let ff = hoy;
+
+        if (preset === 'todo') {
+          fi = '2026-08-01';
+          ff = hoy;
+        } else if (preset === 'septiembre') {
+          fi = '2026-09-01';
+          ff = '2026-09-30';
+        } else if (preset === 'octubre') {
+          fi = '2026-10-01';
+          ff = '2026-10-31';
+        } else if (preset === 'este_mes') {
+          fi = `${hoy.slice(0, 7)}-01`;
+          ff = hoy;
+        } else if (preset === 'ultimos_30') {
+          const d = new Date();
+          d.setDate(d.getDate() - 30);
+          fi = new Intl.DateTimeFormat('sv-SE', { timeZone: dateUtils.TIMEZONE }).format(d);
+          ff = hoy;
+        }
+
+        this.state.fecha_inicio = fi;
+        this.state.fecha_fin = ff;
+        this.state.cargando = true;
+        this.renderUI();
+        await this.cargarReportes();
         this.renderUI();
         this.attachEvents();
       });
