@@ -48,12 +48,18 @@ async function importarComponente(file) {
     }
 }
 
-function render() {
-    if (!isAutenticado() && rutaActual().id !== "login") {
-        location.hash = "#/login";
+async function render() {
+    if (!isAutenticado()) {
+        if (rutaActual().id !== "login") {
+            location.hash = "#/login";
+        }
+        return renderLogin();
     }
     const { id } = rutaActual();
-    if (id === "login") return renderLogin();
+    if (id === "login") {
+        location.hash = "#/dashboard";
+        return;
+    }
     return renderShell();
 }
 

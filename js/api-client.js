@@ -64,6 +64,12 @@ export class APIClient {
       }
 
       if (!response.ok) {
+        if (response.status === 401 && endpoint !== '/login') {
+          this.logout();
+          if (typeof window !== 'undefined' && window.location.hash !== '#/login') {
+            window.location.hash = '#/login';
+          }
+        }
         throw new Error(result.error || `Error ${response.status}`);
       }
 
@@ -128,4 +134,22 @@ export class APIClient {
 
 // Instancia global
 export const api = new APIClient();
+
+// Interceptar respuestas 401 para limpiar token expirado y redirigir al login
+if (typeof window !== 'undefined' && window.fetch) {
+  const originalFetch = window.fetch.bind(window);
+  window.fetch = async (...args) => {
+    const res = await originalFetch(...args);
+    if (res.status === 401) {
+      const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+      if (!url.includes('/api/login')) {
+        api.logout();
+        if (window.location.hash !== '#/login') {
+          window.location.hash = '#/login';
+        }
+      }
+    }
+    return res;
+  };
+}
 
