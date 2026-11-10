@@ -159,13 +159,13 @@ function renderShell() {
     const { id } = rutaActual();
 
     app.innerHTML = `
-    <div class="min-h-screen flex bg-gray-50 dark:bg-gray-950">
+    <div class="h-screen overflow-hidden flex bg-gray-50 dark:bg-gray-950">
       <!-- Aside -->
-      <aside id="aside" class="fixed md:static inset-y-0 left-0 z-40 w-64 transform transition-transform duration-300
+      <aside id="aside" class="fixed md:sticky top-0 inset-y-0 left-0 z-40 w-64 h-screen shrink-0 flex flex-col transform transition-transform duration-300
                                ${asideAbierto ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
                                bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shadow-lg dark:shadow-2xl">
-        <!-- Header -->
-        <div class="h-16 flex items-center gap-3 px-4 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+        <!-- Header Sidebar -->
+        <div class="h-16 shrink-0 flex items-center gap-3 px-4 border-b border-gray-200 dark:border-gray-700">
           <img src="./assets/img/NAPOLES.jpeg" alt="Napoles Barbería" class="h-10 w-auto object-contain" />
           <div class="font-bold text-sm min-w-0">
             <div style="color: #dec389">Napoles Barbería</div>
@@ -174,7 +174,7 @@ function renderShell() {
         </div>
 
         <!-- Navigation -->
-        <nav class="p-3 overflow-y-auto" style="height: calc(100vh - 7rem);">
+        <nav class="p-3 overflow-y-auto flex-1">
           <p class="px-3 py-2 text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400 font-semibold">Módulos</p>
           
           <ul id="listaComponentes" class="mt-2 space-y-1"></ul>
@@ -205,9 +205,9 @@ function renderShell() {
       <div id="overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 md:hidden ${asideAbierto ? "" : "hidden"}"></div>
 
       <!-- Main -->
-      <div class="flex-1 min-w-0 flex flex-col">
-        <!-- Header -->
-        <header class="h-14 sm:h-16 flex items-center justify-between px-3 sm:px-6 border-b border-gray-200 dark:border-gray-700
+      <div class="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+        <!-- Header / Navbar Fijo -->
+        <header class="h-14 sm:h-16 shrink-0 flex items-center justify-between px-3 sm:px-6 border-b border-gray-200 dark:border-gray-700
                         bg-white dark:bg-gray-900 shadow-sm dark:shadow-none sticky top-0 z-30">
           <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <button id="btnToggleAside" class="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition shrink-0" aria-label="Menú">

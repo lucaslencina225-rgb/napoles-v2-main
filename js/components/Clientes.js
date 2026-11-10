@@ -12,7 +12,7 @@ export default {
     filtro_fecha_inicio: '',
     filtro_fecha_fin: '',
     pagina: 1,
-    por_pagina: 20
+    por_pagina: 10
   },
 
   async render(container) {

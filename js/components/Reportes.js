@@ -9,7 +9,7 @@ export default {
   state: {
     reportes: [], productos: [], clientes: [], barberos: [],
     fecha_inicio: "", fecha_fin: "", tab: "ventas", cargando: false,
-    pagina_ventas: 1, pagina_productos: 1, pagina_clientes: 1, por_pagina: 20
+    pagina_ventas: 1, pagina_productos: 1, pagina_clientes: 1, por_pagina: 10
   },
 
   async render(c) {

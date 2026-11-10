@@ -10,9 +10,9 @@
  * @param {number} pagina 
  * @param {number} porPagina 
  */
-export function paginate(allItems, pagina = 1, porPagina = 20) {
+export function paginate(allItems, pagina = 1, porPagina = 10) {
   const total = Array.isArray(allItems) ? allItems.length : 0;
-  const numPorPagina = Math.max(1, parseInt(porPagina, 10) || 20);
+  const numPorPagina = Math.max(1, parseInt(porPagina, 10) || 10);
   const totalPaginas = Math.max(1, Math.ceil(total / numPorPagina));
   const pag = Math.min(Math.max(1, parseInt(pagina, 10) || 1), totalPaginas);
   const inicio = (pag - 1) * numPorPagina;
