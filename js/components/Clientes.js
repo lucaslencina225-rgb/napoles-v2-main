@@ -1,6 +1,7 @@
 import { sortableTables, refreshWithFocus, searchText } from '../utils/table-utils.js';
 import { api } from '../api-client.js';
 import toast from '../utils/toast.js';
+import { paginate, paginationHTML, attachPaginationEvents } from '../utils/pagination.js';
 
 export default {
   state: {
@@ -9,7 +10,9 @@ export default {
     cliente_editando: null,
     detalle: null,
     filtro_fecha_inicio: '',
-    filtro_fecha_fin: ''
+    filtro_fecha_fin: '',
+    pagina: 1,
+    por_pagina: 20
   },
 
   async render(container) {
@@ -72,9 +75,12 @@ export default {
   },
 
   renderUI() {
-    const rows = this.state.clientes
-      .filter(row => searchText(`${row.nombre} ${row.apellido || ''} ${row.telefono || ''} ${row.email || ''} ${row.codigo_barbero || row.id}`).includes(searchText(this.state.busqueda)))
-      .map(c => `
+    const filtrados = this.state.clientes
+      .filter(row => searchText(`${row.nombre} ${row.apellido || ''} ${row.telefono || ''} ${row.email || ''} ${row.codigo_barbero || row.id}`).includes(searchText(this.state.busqueda)));
+
+    const { items: paginados, info: pgInfo } = paginate(filtrados, this.state.pagina, this.state.por_pagina);
+
+    const rows = paginados.map(c => `
         <tr class="hover:bg-blue-50/50 dark:hover:bg-gray-700/50 transition">
           <td class="px-4 py-3.5 border-t border-gray-100 dark:border-gray-700 font-mono text-xs text-gray-500 dark:text-gray-400">#${this.esc(c.id)}</td>
           <td class="px-4 py-3.5 border-t border-gray-100 dark:border-gray-700 font-semibold text-gray-900 dark:text-gray-100">
@@ -111,7 +117,7 @@ export default {
       `).join('');
 
     const totalClientes = this.state.clientes.length;
-    const filtradosCount = this.state.clientes.filter(row => searchText(`${row.nombre} ${row.apellido || ''} ${row.telefono || ''} ${row.email || ''} ${row.codigo_barbero || row.id}`).includes(searchText(this.state.busqueda))).length;
+    const filtradosCount = pgInfo.total;
 
     this.container.innerHTML = `
       <div class="space-y-5">
@@ -195,6 +201,7 @@ export default {
               </tbody>
             </table>
           </div>
+          ${paginationHTML(pgInfo)}
         </div>
 
         <div id="modalCliente" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-2 sm:p-4" style="backdrop-filter: blur(2px);">
@@ -356,6 +363,9 @@ export default {
 
   attachEvents() {
     sortableTables(this);
+    // Paginación
+    attachPaginationEvents(this.container, this.state, () => { this.renderUI(); this.attachEvents(); });
+
     // Configurar cierre de modales con ESC y click fuera
     this.setupModalClose('modalCliente', 'btnCerrarModalCliente');
     this.setupModalClose('modalDetalleCliente', 'btnCerrarDetalle');
@@ -363,6 +373,7 @@ export default {
 
     document.getElementById('clientesBuscar')?.addEventListener('input', (e) => {
       this.state.busqueda = e.target.value;
+      this.state.pagina = 1;
       if (!e.isComposing) refreshWithFocus(this);
     });
 
