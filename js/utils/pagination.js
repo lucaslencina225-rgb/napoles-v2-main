@@ -1,9 +1,14 @@
 /**
  * Utilidad de paginación reutilizable para tablas y módulos.
+ * Incluye estilos inline a prueba de fallos (sin depender de Tailwind externo ni sufrir problemas de caché)
+ * y soporte completo de tema claro / oscuro.
  */
 
 /**
  * Pagina un array y devuelve los items de la página actual + metadata.
+ * @param {Array} allItems 
+ * @param {number} pagina 
+ * @param {number} porPagina 
  */
 export function paginate(allItems, pagina = 1, porPagina = 20) {
   const total = Array.isArray(allItems) ? allItems.length : 0;
@@ -33,7 +38,21 @@ export function paginationHTML(info) {
   const { pagina: pg, porPagina, total, totalPaginas, inicio, fin } = info;
   if (!total || total <= 0) return '';
 
-  // Rango de botones de página (máximo 5 botones numéricos)
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+
+  // Paleta de estilos directa para garantizar 0 superposición
+  const bgBar = isDark ? '#1e293b' : '#f8fafc';
+  const borderColor = isDark ? '#374151' : '#e5e7eb';
+  const textColor = isDark ? '#cbd5e1' : '#475569';
+  const strongColor = isDark ? '#f8fafc' : '#0f172a';
+  const btnBg = isDark ? '#334155' : '#ffffff';
+  const btnBorder = isDark ? '#475569' : '#d1d5db';
+  const btnText = isDark ? '#f1f5f9' : '#1e293b';
+  const selectBg = isDark ? '#334155' : '#ffffff';
+  const selectBorder = isDark ? '#475569' : '#d1d5db';
+  const selectText = isDark ? '#f8fafc' : '#0f172a';
+
+  // Rango de páginas (máximo 5 páginas visibles)
   let desde = Math.max(1, pg - 2);
   let hasta = Math.min(totalPaginas, pg + 2);
   if (pg <= 3) hasta = Math.min(totalPaginas, 5);
@@ -41,47 +60,62 @@ export function paginationHTML(info) {
   desde = Math.max(1, desde);
 
   const pages = [];
-  for (let i = desde; i <= hasta; i++) {
-    const isActive = i === pg;
-    pages.push(`
-      <button type="button" data-pag="${i}" class="pag-btn px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
-        isActive
-          ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-700'
-          : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-blue-50 dark:hover:bg-gray-700'
-      }">${i}</button>
-    `);
+  if (totalPaginas > 1) {
+    for (let i = desde; i <= hasta; i++) {
+      const isActive = i === pg;
+      const bg = isActive ? '#2563eb' : btnBg;
+      const border = isActive ? '#1d4ed8' : btnBorder;
+      const color = isActive ? '#ffffff' : btnText;
+      const shadow = isActive ? 'box-shadow: 0 1px 2px rgba(0,0,0,0.15); font-weight: 700;' : 'font-weight: 600;';
+      pages.push(`
+        <button type="button" data-pag="${i}" class="pag-btn" style="display:inline-flex; align-items:center; justify-content:center; min-width:32px; height:32px; padding:0 8px; border-radius:6px; font-size:12px; border:1px solid ${border}; background:${bg}; color:${color}; cursor:pointer; user-select:none; ${shadow}">
+          ${i}
+        </button>
+      `);
+    }
   }
 
   const opt = (v) => `<option value="${v}" ${Number(porPagina) === v ? 'selected' : ''}>${v}</option>`;
-  const navBtn = (p, icon, disabled, title) => `
-    <button type="button" data-pag="${p}" title="${title}" class="pag-btn px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition ${
-      disabled ? 'opacity-35 cursor-not-allowed pointer-events-none' : 'cursor-pointer'
-    }"><i class="fas ${icon}"></i></button>
-  `;
+  
+  const navBtn = (p, icon, disabled, title) => {
+    const opacity = disabled ? 'opacity: 0.35; cursor: not-allowed; pointer-events: none;' : 'cursor: pointer;';
+    const disAttr = disabled ? 'disabled="disabled"' : '';
+    return `
+      <button type="button" data-pag="${p}" title="${title}" ${disAttr} class="pag-btn" style="display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:6px; font-size:12px; border:1px solid ${btnBorder}; background:${btnBg}; color:${btnText}; user-select:none; ${opacity}">
+        <i class="fas ${icon}" style="pointer-events: none;"></i>
+      </button>
+    `;
+  };
 
   const inicioTexto = total > 0 ? inicio + 1 : 0;
 
   return `
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-800/90 border-t border-gray-200 dark:border-gray-700">
-      <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
-        <span>Mostrando <strong class="text-gray-900 dark:text-white font-bold">${inicioTexto}–${fin}</strong> de <strong class="text-gray-900 dark:text-white font-bold">${total}</strong></span>
-        <span class="text-gray-300 dark:text-gray-600">|</span>
-        <label class="flex items-center gap-1.5 font-medium">
+    <div data-pagination-bar="true" style="display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:10px 16px; background:${bgBar}; border-top:1px solid ${borderColor}; box-sizing:border-box; width:100%;">
+      <!-- Lado izquierdo: información y selector -->
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:12px; color:${textColor};">
+        <span>Mostrando <strong style="color:${strongColor};">${inicioTexto}–${fin}</strong> de <strong style="color:${strongColor};">${total}</strong></span>
+        <span style="color:${borderColor}; margin:0 2px;">|</span>
+        <label style="display:inline-flex; align-items:center; gap:6px; font-size:12px; color:${textColor}; cursor:pointer;">
           <span>Mostrar:</span>
-          <select data-pagination-select class="text-xs px-2.5 py-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer">
+          <select data-pagination-select class="pag-select" style="padding:4px 8px; font-size:12px; font-weight:700; border-radius:6px; border:1px solid ${selectBorder}; background:${selectBg}; color:${selectText}; cursor:pointer; outline:none;">
             ${opt(10)}${opt(20)}${opt(50)}
           </select>
           <span>por pág.</span>
         </label>
       </div>
-      <div class="flex items-center gap-1">
-        ${navBtn(1, 'fa-angles-left', pg === 1, 'Primera página')}
-        ${navBtn(pg - 1, 'fa-angle-left', pg === 1, 'Página anterior')}
-        ${pages.join('')}
-        ${navBtn(pg + 1, 'fa-angle-right', pg === totalPaginas, 'Página siguiente')}
-        ${navBtn(totalPaginas, 'fa-angles-right', pg === totalPaginas, 'Última página')}
-      </div>
-    </div>`;
+
+      <!-- Lado derecho: botones de navegación -->
+      ${totalPaginas > 1 ? `
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:4px;">
+          ${navBtn(1, 'fa-angles-left', pg === 1, 'Primera página')}
+          ${navBtn(pg - 1, 'fa-angle-left', pg === 1, 'Página anterior')}
+          ${pages.join('')}
+          ${navBtn(pg + 1, 'fa-angle-right', pg === totalPaginas, 'Página siguiente')}
+          ${navBtn(totalPaginas, 'fa-angles-right', pg === totalPaginas, 'Última página')}
+        </div>
+      ` : ''}
+    </div>
+  `;
 }
 
 /**
@@ -93,22 +127,30 @@ export function paginationHTML(info) {
  */
 export function attachPaginationEvents(container, state, rerender, pageKey = 'pagina') {
   if (!container) return;
+  
+  // Buscar botones de paginación
   container.querySelectorAll('.pag-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      if (btn.disabled || btn.hasAttribute('disabled')) return;
       const p = parseInt(btn.dataset.pag, 10);
-      if (!isNaN(p) && p >= 1) {
+      if (!isNaN(p) && p >= 1 && p !== state[pageKey]) {
         state[pageKey] = p;
         rerender();
       }
     });
   });
-  const sel = container.querySelector('[data-pagination-select]');
-  if (sel) {
-    sel.addEventListener('change', () => {
-      state.por_pagina = parseInt(sel.value, 10);
-      state[pageKey] = 1;
-      rerender();
+
+  // Selector de cantidad por página
+  container.querySelectorAll('[data-pagination-select]').forEach(sel => {
+    sel.addEventListener('change', (e) => {
+      const nuevoPorPagina = parseInt(e.target.value, 10);
+      if (!isNaN(nuevoPorPagina) && nuevoPorPagina > 0) {
+        state.por_pagina = nuevoPorPagina;
+        state[pageKey] = 1;
+        rerender();
+      }
     });
-  }
+  });
 }

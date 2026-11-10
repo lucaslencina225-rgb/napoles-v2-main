@@ -1,4 +1,4 @@
-﻿import { sortableTables } from '../utils/table-utils.js';
+import { sortableTables } from '../utils/table-utils.js';
 import { api } from "../api-client.js";
 import { exportarCSV, fmtMoney } from "../utils/print-utils.js";
 import dateUtils from "../utils/date-utils.js";
