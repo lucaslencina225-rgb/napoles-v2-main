@@ -168,7 +168,7 @@ function renderShell() {
         <div class="h-16 flex items-center gap-3 px-4 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
           <img src="./assets/img/NAPOLES.jpeg" alt="Napoles Barbería" class="h-10 w-auto object-contain" />
           <div class="font-bold text-sm min-w-0">
-            <div style="color: #dec389"">Napoles Barbería</div>
+            <div style="color: #dec389">Napoles Barbería</div>
             <div class="text-xs text-gray-500 dark:text-gray-400">Sistema POS</div>
           </div>
         </div>

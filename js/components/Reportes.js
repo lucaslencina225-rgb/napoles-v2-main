@@ -1,5 +1,5 @@
-import { sortableTables } from '../utils/table-utils.js';
-﻿import { api } from "../api-client.js";
+﻿import { sortableTables } from '../utils/table-utils.js';
+import { api } from "../api-client.js";
 import { exportarCSV, fmtMoney } from "../utils/print-utils.js";
 import dateUtils from "../utils/date-utils.js";
 import toast from "../utils/toast.js";
@@ -51,7 +51,7 @@ export default {
     this.state.cargando  = false;
   },
 
-  // ─── Inline style helpers (dark-mode safe) ─────────────────────────────────
+  // â”€â”€â”€ Inline style helpers (dark-mode safe) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   _s() {
     const dark = document.documentElement.classList.contains("dark");
     return {
@@ -80,7 +80,7 @@ export default {
       transferencia: "background:#2e1065;color:#e9d5ff;",
     };
     const style = map[medio] || "background:#374151;color:#e5e7eb;";
-    return `<span style="${style}padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">${medio || "—"}</span>`;
+    return `<span style="${style}padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">${medio || "â€”"}</span>`;
   },
 
   _badgeEstado(estado) {
@@ -92,10 +92,10 @@ export default {
       entregada:  "background:#1e3a5f;color:#bfdbfe;",
     };
     const style = map[estado] || "background:#374151;color:#e5e7eb;";
-    return `<span style="${style}padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">${estado || "—"}</span>`;
+    return `<span style="${style}padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">${estado || "â€”"}</span>`;
   },
 
-  // ─── Render UI ───────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Render UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   renderUI() {
     const tabs = [
       { id: "ventas",    label: "Ventas",    icon: "fa-chart-line" },
@@ -112,9 +112,9 @@ export default {
             <i class="fas fa-chart-bar mr-2 text-blue-600"></i>Reportes
           </h2>
 
-          <!-- Presets rápidos de fecha -->
+          <!-- Presets rÃ¡pidos de fecha -->
           <div class="flex flex-wrap items-center gap-2 mb-3">
-            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 mr-1"><i class="fas fa-filter mr-1"></i>Período rápido:</span>
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 mr-1"><i class="fas fa-filter mr-1"></i>PerÃ­odo rÃ¡pido:</span>
             <button type="button" data-preset="todo" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200 dark:hover:bg-blue-900/60 transition">
               <i class="fas fa-history mr-1"></i>Todo el Historial
             </button>
@@ -128,7 +128,7 @@ export default {
               Este Mes
             </button>
             <button type="button" data-preset="ultimos_30" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition">
-              Últimos 30 días
+              Ãšltimos 30 dÃ­as
             </button>
           </div>
 
@@ -157,7 +157,7 @@ export default {
             </div>
           </div>
 
-          <!-- Resumen Mensual Histórico -->
+          <!-- Resumen Mensual HistÃ³rico -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
             <div class="p-3.5 rounded-lg border border-purple-200 dark:border-purple-800/60 bg-purple-50/70 dark:bg-purple-950/20">
               <div class="flex justify-between items-center mb-1">
@@ -165,7 +165,7 @@ export default {
                 <span class="text-xs px-2 py-0.5 rounded-full bg-purple-200 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 font-bold">233 vtas</span>
               </div>
               <div class="text-xl font-extrabold text-purple-900 dark:text-purple-100">$2.921.000</div>
-              <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">24 cajas cerradas • 147 clientes</div>
+              <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">24 cajas cerradas â€¢ 147 clientes</div>
             </div>
             <div class="p-3.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 bg-indigo-50/70 dark:bg-indigo-950/20">
               <div class="flex justify-between items-center mb-1">
@@ -173,7 +173,7 @@ export default {
                 <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200 font-bold">196 vtas</span>
               </div>
               <div class="text-xl font-extrabold text-indigo-900 dark:text-indigo-100">$2.586.000</div>
-              <div class="text-xs text-indigo-600 dark:text-indigo-400 mt-1">23 cajas cerradas • 57 clientes</div>
+              <div class="text-xs text-indigo-600 dark:text-indigo-400 mt-1">23 cajas cerradas â€¢ 57 clientes</div>
             </div>
             <div class="p-3.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/70 dark:bg-emerald-950/20">
               <div class="flex justify-between items-center mb-1">
@@ -181,7 +181,7 @@ export default {
                 <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-bold">433 vtas</span>
               </div>
               <div class="text-xl font-extrabold text-emerald-900 dark:text-emerald-100">$5.557.000</div>
-              <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">48 cajas cerradas • 208 clientes</div>
+              <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">48 cajas cerradas â€¢ 208 clientes</div>
             </div>
           </div>
 
@@ -208,7 +208,7 @@ export default {
       </div>`;
   },
 
-  // ─── Tab dispatcher ──────────────────────────────────────────────────────────
+  // â”€â”€â”€ Tab dispatcher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   renderTabContent() {
     const s = this._s();
     switch (this.state.tab) {
@@ -220,7 +220,7 @@ export default {
     }
   },
 
-  // ── Ventas ──────────────────────────────────────────────────────────────────
+  // â”€â”€ Ventas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   _tabVentas(s) {
     const v = this.state.reportes;
     const total    = v.reduce((a, x) => a + (x.total || 0), 0);
@@ -251,7 +251,7 @@ export default {
         <td style="${s.td}">${x.cliente_nombre ? (x.cliente_nombre + " " + (x.cliente_apellido || "")).trim() : '<span style="color:#94a3b8;font-style:italic;">Sin cliente</span>'}</td>
         <td style="${s.td}">${x.barbero_nombre ? (x.barbero_nombre + " " + (x.barbero_apellido || "")).trim() : '<span style="color:#94a3b8;font-style:italic;">Sin barbero</span>'}</td>
         <td style="${s.tdC}">${this._badgePago(x.medio_pago)}</td>
-        <td style="${s.td}">${x.sucursal_nombre || "—"}</td>
+        <td style="${s.td}">${x.sucursal_nombre || "â€”"}</td>
         <td style="${s.tdC}">${this._badgeEstado(x.estado)}</td>
         <td style="${s.tdR}">${fmtMoney(x.total)}</td>
       </tr>`;
@@ -294,7 +294,7 @@ export default {
       </div>`;
   },
 
-  // ── Productos ───────────────────────────────────────────────────────────────
+  // â”€â”€ Productos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   _tabProductos(s) {
     const p = this.state.productos;
     const totalUnidades  = p.reduce((a, x) => a + (x.cantidad_vendida || 0), 0);
@@ -308,7 +308,7 @@ export default {
       const barW   = Math.max(2, Math.round(parseFloat(pct)));
       const barClr = s.dark ? "#2563eb" : "#3b82f6";
       return `<tr style="${bg}">
-        <td style="${s.tdMono}">${x.sku || "—"}</td>
+        <td style="${s.tdMono}">${x.sku || "â€”"}</td>
         <td style="${s.td}font-weight:600;">${x.nombre}</td>
         <td style="${s.tdC}font-weight:700;">${x.cantidad_vendida}</td>
         <td style="${s.td}">
@@ -346,7 +346,7 @@ export default {
       </div>`;
   },
 
-  // ── Clientes ────────────────────────────────────────────────────────────────
+  // â”€â”€ Clientes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   _tabClientes(s) {
     const c = this.state.clientes;
     const totalGastado = c.reduce((a, x) => a + (x.total_gastado || 0), 0);
@@ -395,7 +395,7 @@ export default {
       </div>`;
   },
 
-  // ── Barberos ────────────────────────────────────────────────────────────────
+  // â”€â”€ Barberos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   _tabBarberos(s) {
     const bars = this.state.barberos;
     if (!bars.length) {
@@ -420,7 +420,7 @@ export default {
       const itemRows = bar.items && bar.items.length
         ? bar.items.map(it => `<tr>
             <td style="${s.td}">${it.producto_nombre}</td>
-            <td style="${s.tdMono}">${it.sku || "—"}</td>
+            <td style="${s.tdMono}">${it.sku || "â€”"}</td>
             <td style="${s.tdC}font-weight:700;">${it.cantidad}</td>
             <td style="${s.tdR}color:${s.dark ? "#86efac" : "#15803d"};">${fmtMoney(it.subtotal)}</td>
           </tr>`).join("")
@@ -459,7 +459,7 @@ export default {
     return `<div>${summary}${cards}</div>`;
   },
 
-  // ─── Events ──────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   attachEvents() {
     sortableTables(this, this.state.tab);
     this.container.querySelectorAll("[data-tab]").forEach(btn => {
@@ -524,7 +524,7 @@ export default {
     document.getElementById("btnExportarPDF")?.addEventListener("click", () => this.exportarPDF());
   },
 
-  // ─── PDF Export ───────────────────────────────────────────────────────────────
+  // â”€â”€â”€ PDF Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   exportarPDF() {
     const fi   = dateUtils.formatDate(this.state.fecha_inicio);
     const ff   = dateUtils.formatDate(this.state.fecha_fin);
@@ -575,11 +575,11 @@ export default {
             <td ${tdS} style="font-family:monospace;font-size:11px;">${x.numero_ticket || x.id}</td>
             <td ${tdS}>${dateUtils.formatDate(x.fecha_venta)}</td>
             <td ${tdS}>${dateUtils.formatTime(x.fecha_venta)}</td>
-            <td ${tdS}>${x.cliente_nombre ? (x.cliente_nombre + " " + (x.cliente_apellido || "")).trim() : "—"}</td>
-            <td ${tdS}>${x.barbero_nombre ? (x.barbero_nombre + " " + (x.barbero_apellido || "")).trim() : "—"}</td>
-            <td ${tdCS}><span style="background:#f3f4f6;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;">${x.medio_pago || "—"}</span></td>
-            <td ${tdS}>${x.sucursal_nombre || "—"}</td>
-            <td ${tdS}>${x.estado || "—"}</td>
+            <td ${tdS}>${x.cliente_nombre ? (x.cliente_nombre + " " + (x.cliente_apellido || "")).trim() : "â€”"}</td>
+            <td ${tdS}>${x.barbero_nombre ? (x.barbero_nombre + " " + (x.barbero_apellido || "")).trim() : "â€”"}</td>
+            <td ${tdCS}><span style="background:#f3f4f6;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;">${x.medio_pago || "â€”"}</span></td>
+            <td ${tdS}>${x.sucursal_nombre || "â€”"}</td>
+            <td ${tdS}>${x.estado || "â€”"}</td>
             <td ${tdRS}>${fmtMoney(x.total)}</td>
           </tr>`).join("") || `<tr><td colspan="9" style="padding:16px;text-align:center;color:#9ca3af;">Sin ventas</td></tr>`}
           </tbody>
@@ -599,7 +599,7 @@ export default {
             <th ${thCS}>Unidades</th><th ${thRS}>Facturado</th>
           </tr></thead>
           <tbody>${p.map(x => `<tr>
-            <td ${tdS} style="font-family:monospace;font-size:11px;">${x.sku || "—"}</td>
+            <td ${tdS} style="font-family:monospace;font-size:11px;">${x.sku || "â€”"}</td>
             <td ${tdS}>${x.nombre}</td>
             <td ${tdCS} style="font-weight:700;">${x.cantidad_vendida}</td>
             <td ${tdRS}>${fmtMoney(x.total_facturado)}</td>
@@ -639,7 +639,7 @@ export default {
         const rows = bar.items && bar.items.length
           ? bar.items.map(it => `<tr>
               <td ${tdS}>${it.producto_nombre}</td>
-              <td ${tdS} style="font-family:monospace;font-size:11px;">${it.sku || "—"}</td>
+              <td ${tdS} style="font-family:monospace;font-size:11px;">${it.sku || "â€”"}</td>
               <td ${tdCS} style="font-weight:700;">${it.cantidad}</td>
               <td ${tdRS} style="color:#15803d;">${fmtMoney(it.subtotal)}</td>
             </tr>`).join("") +
@@ -689,7 +689,7 @@ export default {
     }).from(el).save();
   },
 
-  // ─── CSV Export ───────────────────────────────────────────────────────────────
+  // â”€â”€â”€ CSV Export â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   exportar() {
     const fi   = dateUtils.formatDate(this.state.fecha_inicio);
     const ff   = dateUtils.formatDate(this.state.fecha_fin);
