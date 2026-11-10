@@ -64,8 +64,10 @@ export class APIClient {
       }
 
       if (!response.ok) {
-        if (response.status === 401 && endpoint !== '/login') {
-          this.logout();
+        if (response.status === 401 && endpoint !== '/login' && endpoint !== '/logout') {
+          localStorage.removeItem('pos_auth_token');
+          this.token = null;
+          this.usuario = null;
           if (typeof window !== 'undefined' && window.location.hash !== '#/login') {
             window.location.hash = '#/login';
           }
@@ -107,7 +109,13 @@ export class APIClient {
   // Logout
   async logout() {
     try {
-      await this.request('POST', '/logout');
+      const token = this.token || this.getToken();
+      if (token) {
+        await fetch(`${this.baseURL}/api/logout`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+      }
     } catch (e) {
       // Ignorar error en logout
     }
@@ -134,22 +142,4 @@ export class APIClient {
 
 // Instancia global
 export const api = new APIClient();
-
-// Interceptar respuestas 401 para limpiar token expirado y redirigir al login
-if (typeof window !== 'undefined' && window.fetch) {
-  const originalFetch = window.fetch.bind(window);
-  window.fetch = async (...args) => {
-    const res = await originalFetch(...args);
-    if (res.status === 401) {
-      const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
-      if (!url.includes('/api/login')) {
-        api.logout();
-        if (window.location.hash !== '#/login') {
-          window.location.hash = '#/login';
-        }
-      }
-    }
-    return res;
-  };
-}
 
