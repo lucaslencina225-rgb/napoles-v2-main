@@ -3,11 +3,13 @@ import { api } from "../api-client.js";
 import { exportarCSV, fmtMoney } from "../utils/print-utils.js";
 import dateUtils from "../utils/date-utils.js";
 import toast from "../utils/toast.js";
+import { paginate, paginationHTML, attachPaginationEvents } from "../utils/pagination.js";
 
 export default {
   state: {
     reportes: [], productos: [], clientes: [], barberos: [],
-    fecha_inicio: "", fecha_fin: "", tab: "ventas", cargando: false
+    fecha_inicio: "", fecha_fin: "", tab: "ventas", cargando: false,
+    pagina_ventas: 1, pagina_productos: 1, pagina_clientes: 1, por_pagina: 20
   },
 
   async render(c) {
@@ -220,7 +222,7 @@ export default {
     }
   },
 
-  // â”€â”€ Ventas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Ventas ─────────────────────────────────────────────────────────────
   _tabVentas(s) {
     const v = this.state.reportes;
     const total    = v.reduce((a, x) => a + (x.total || 0), 0);
@@ -229,6 +231,8 @@ export default {
     const transf   = v.filter(x => x.medio_pago === "transferencia").reduce((a, x) => a + (x.total || 0), 0);
     const promedio = v.length ? total / v.length : 0;
     const maximo   = v.length ? Math.max(...v.map(x => x.total || 0)) : 0;
+
+    const { items: paginados, info: pgInfo } = paginate(v, this.state.pagina_ventas, this.state.por_pagina);
 
     const cardBlue   = s.dark ? "background:#1e3a5f;border:1px solid #2563eb;border-radius:10px;padding:14px;" : "background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;";
     const cardGreen  = s.dark ? "background:#14532d;border:1px solid #16a34a;border-radius:10px;padding:14px;" : "background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;";
@@ -240,7 +244,7 @@ export default {
     const lbl = (c, t) => `<p style="${c}font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;">${t}</p>`;
     const val = (c, t) => `<p style="${c}font-size:20px;font-weight:800;margin:0;">${t}</p>`;
 
-    const rows = v.map((x, i) => {
+    const rows = paginados.map((x, i) => {
       const bg = i % 2 === 0
         ? (s.dark ? "background:#111827;" : "background:#ffffff;")
         : (s.dark ? "background:#1e293b;" : "background:#f8fafc;");
@@ -251,7 +255,7 @@ export default {
         <td style="${s.td}">${x.cliente_nombre ? (x.cliente_nombre + " " + (x.cliente_apellido || "")).trim() : '<span style="color:#94a3b8;font-style:italic;">Sin cliente</span>'}</td>
         <td style="${s.td}">${x.barbero_nombre ? (x.barbero_nombre + " " + (x.barbero_apellido || "")).trim() : '<span style="color:#94a3b8;font-style:italic;">Sin barbero</span>'}</td>
         <td style="${s.tdC}">${this._badgePago(x.medio_pago)}</td>
-        <td style="${s.td}">${x.sucursal_nombre || "â€”"}</td>
+        <td style="${s.td}">${x.sucursal_nombre || "—"}</td>
         <td style="${s.tdC}">${this._badgeEstado(x.estado)}</td>
         <td style="${s.tdR}">${fmtMoney(x.total)}</td>
       </tr>`;
@@ -269,38 +273,43 @@ export default {
         <div style="${cardSlate}">${lbl(s.dark ? "color:#94a3b8;" : "color:#475569;", "Transferencia")}${val(s.dark ? "color:#e2e8f0;" : "color:#475569;", fmtMoney(transf))}</div>
       </div>
 
-      <!-- Tabla -->
-      <div style="${s.tableBox}overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;">
-          <thead><tr>
-            <th style="${s.th}">Ticket</th>
-            <th style="${s.th}">Fecha</th>
-            <th style="${s.th}">Hora</th>
-            <th style="${s.th}">Cliente</th>
-            <th style="${s.th}">Barbero</th>
-            <th style="${s.thC}">Pago</th>
-            <th style="${s.th}">Sucursal</th>
-            <th style="${s.thC}">Estado</th>
-            <th style="${s.thR}">Total</th>
-          </tr></thead>
-          <tbody>
-            ${rows || `<tr><td colspan="9" style="${s.empty}"><i class="fas fa-inbox" style="display:block;font-size:2rem;margin-bottom:8px;"></i>Sin ventas en el per&iacute;odo seleccionado</td></tr>`}
-          </tbody>
-          ${v.length ? `<tfoot><tr>
-            <td colspan="8" style="${s.tfoot}text-align:right;">TOTAL &mdash; ${v.length} venta${v.length !== 1 ? "s" : ""}</td>
-            <td style="${s.tfootR}">${fmtMoney(total)}</td>
-          </tr></tfoot>` : ""}
-        </table>
+      <!-- Tabla con Paginación -->
+      <div style="${s.tableBox}">
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead><tr>
+              <th style="${s.th}">Ticket</th>
+              <th style="${s.th}">Fecha</th>
+              <th style="${s.th}">Hora</th>
+              <th style="${s.th}">Cliente</th>
+              <th style="${s.th}">Barbero</th>
+              <th style="${s.thC}">Pago</th>
+              <th style="${s.th}">Sucursal</th>
+              <th style="${s.thC}">Estado</th>
+              <th style="${s.thR}">Total</th>
+            </tr></thead>
+            <tbody>
+              ${rows || `<tr><td colspan="9" style="${s.empty}"><i class="fas fa-inbox" style="display:block;font-size:2rem;margin-bottom:8px;"></i>Sin ventas en el per&iacute;odo seleccionado</td></tr>`}
+            </tbody>
+            ${v.length ? `<tfoot><tr>
+              <td colspan="8" style="${s.tfoot}text-align:right;">TOTAL &mdash; ${v.length} venta${v.length !== 1 ? "s" : ""}</td>
+              <td style="${s.tfootR}">${fmtMoney(total)}</td>
+            </tr></tfoot>` : ""}
+          </table>
+        </div>
+        ${paginationHTML(pgInfo)}
       </div>`;
   },
 
-  // â”€â”€ Productos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Productos ─────────────────────────────────────────────────────────
   _tabProductos(s) {
     const p = this.state.productos;
     const totalUnidades  = p.reduce((a, x) => a + (x.cantidad_vendida || 0), 0);
     const totalFacturado = p.reduce((a, x) => a + (x.total_facturado || 0), 0);
 
-    const rows = p.map((x, i) => {
+    const { items: paginados, info: pgInfo } = paginate(p, this.state.pagina_productos, this.state.por_pagina);
+
+    const rows = paginados.map((x, i) => {
       const bg = i % 2 === 0
         ? (s.dark ? "background:#111827;" : "background:#ffffff;")
         : (s.dark ? "background:#1e293b;" : "background:#f8fafc;");
@@ -308,7 +317,7 @@ export default {
       const barW   = Math.max(2, Math.round(parseFloat(pct)));
       const barClr = s.dark ? "#2563eb" : "#3b82f6";
       return `<tr style="${bg}">
-        <td style="${s.tdMono}">${x.sku || "â€”"}</td>
+        <td style="${s.tdMono}">${x.sku || "—"}</td>
         <td style="${s.td}font-weight:600;">${x.nombre}</td>
         <td style="${s.tdC}font-weight:700;">${x.cantidad_vendida}</td>
         <td style="${s.td}">
@@ -324,34 +333,39 @@ export default {
     }).join("");
 
     return `
-      <div style="${s.tableBox}overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;">
-          <thead><tr>
-            <th style="${s.th}">SKU</th>
-            <th style="${s.th}">Producto / Servicio</th>
-            <th style="${s.thC}">Unidades</th>
-            <th style="${s.th}">Participaci&oacute;n</th>
-            <th style="${s.thR}">Facturado</th>
-          </tr></thead>
-          <tbody>
-            ${rows || `<tr><td colspan="5" style="${s.empty}">Sin productos vendidos en el per&iacute;odo</td></tr>`}
-          </tbody>
-          ${p.length ? `<tfoot><tr>
-            <td colspan="2" style="${s.tfoot}text-align:right;">${p.length} producto${p.length !== 1 ? "s" : ""}</td>
-            <td style="${s.tfoot}text-align:center;">${totalUnidades}</td>
-            <td style="${s.tfoot}"></td>
-            <td style="${s.tfootR}">${fmtMoney(totalFacturado)}</td>
-          </tr></tfoot>` : ""}
-        </table>
+      <div style="${s.tableBox}">
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead><tr>
+              <th style="${s.th}">SKU</th>
+              <th style="${s.th}">Producto / Servicio</th>
+              <th style="${s.thC}">Unidades</th>
+              <th style="${s.th}">Participaci&oacute;n</th>
+              <th style="${s.thR}">Facturado</th>
+            </tr></thead>
+            <tbody>
+              ${rows || `<tr><td colspan="5" style="${s.empty}">Sin productos vendidos en el per&iacute;odo</td></tr>`}
+            </tbody>
+            ${p.length ? `<tfoot><tr>
+              <td colspan="2" style="${s.tfoot}text-align:right;">${p.length} producto${p.length !== 1 ? "s" : ""}</td>
+              <td style="${s.tfoot}text-align:center;">${totalUnidades}</td>
+              <td style="${s.tfoot}"></td>
+              <td style="${s.tfootR}">${fmtMoney(totalFacturado)}</td>
+            </tr></tfoot>` : ""}
+          </table>
+        </div>
+        ${paginationHTML(pgInfo)}
       </div>`;
   },
 
-  // â”€â”€ Clientes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Clientes ──────────────────────────────────────────────────────────
   _tabClientes(s) {
     const c = this.state.clientes;
     const totalGastado = c.reduce((a, x) => a + (x.total_gastado || 0), 0);
 
-    const rows = c.map((x, i) => {
+    const { items: paginados, info: pgInfo } = paginate(c, this.state.pagina_clientes, this.state.por_pagina);
+
+    const rows = paginados.map((x, i) => {
       const bg = i % 2 === 0
         ? (s.dark ? "background:#111827;" : "background:#ffffff;")
         : (s.dark ? "background:#1e293b;" : "background:#f8fafc;");
@@ -375,23 +389,26 @@ export default {
     }).join("");
 
     return `
-      <div style="${s.tableBox}overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;">
-          <thead><tr>
-            <th style="${s.th}">Cliente</th>
-            <th style="${s.thC}">Compras</th>
-            <th style="${s.thR}">Ticket promedio</th>
-            <th style="${s.th}">Participaci&oacute;n</th>
-            <th style="${s.thR}">Total gastado</th>
-          </tr></thead>
-          <tbody>
-            ${rows || `<tr><td colspan="5" style="${s.empty}">Sin clientes con compras en el per&iacute;odo</td></tr>`}
-          </tbody>
-          ${c.length ? `<tfoot><tr>
-            <td colspan="4" style="${s.tfoot}text-align:right;">${c.length} cliente${c.length !== 1 ? "s" : ""}</td>
-            <td style="${s.tfootR}">${fmtMoney(totalGastado)}</td>
-          </tr></tfoot>` : ""}
-        </table>
+      <div style="${s.tableBox}">
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead><tr>
+              <th style="${s.th}">Cliente</th>
+              <th style="${s.thC}">Compras</th>
+              <th style="${s.thR}">Ticket promedio</th>
+              <th style="${s.th}">Participaci&oacute;n</th>
+              <th style="${s.thR}">Total gastado</th>
+            </tr></thead>
+            <tbody>
+              ${rows || `<tr><td colspan="5" style="${s.empty}">Sin clientes con compras en el per&iacute;odo</td></tr>`}
+            </tbody>
+            ${c.length ? `<tfoot><tr>
+              <td colspan="4" style="${s.tfoot}text-align:right;">${c.length} cliente${c.length !== 1 ? "s" : ""}</td>
+              <td style="${s.tfootR}">${fmtMoney(totalGastado)}</td>
+            </tr></tfoot>` : ""}
+          </table>
+        </div>
+        ${paginationHTML(pgInfo)}
       </div>`;
   },
 
@@ -459,9 +476,24 @@ export default {
     return `<div>${summary}${cards}</div>`;
   },
 
-  // â”€â”€â”€ Events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Events ──────────────────────────────────────────────────────────
   attachEvents() {
     sortableTables(this, this.state.tab);
+
+    // Paginación según pestaña activa
+    const pageKeyMap = {
+      ventas: 'pagina_ventas',
+      productos: 'pagina_productos',
+      clientes: 'pagina_clientes'
+    };
+    const currentKey = pageKeyMap[this.state.tab];
+    if (currentKey) {
+      attachPaginationEvents(this.container, this.state, () => {
+        this.renderUI();
+        this.attachEvents();
+      }, currentKey);
+    }
+
     this.container.querySelectorAll("[data-tab]").forEach(btn => {
       btn.addEventListener("click", e => {
         this.state.tab = e.target.closest("[data-tab]").dataset.tab;
@@ -498,6 +530,9 @@ export default {
 
         this.state.fecha_inicio = fi;
         this.state.fecha_fin = ff;
+        this.state.pagina_ventas = 1;
+        this.state.pagina_productos = 1;
+        this.state.pagina_clientes = 1;
         this.state.cargando = true;
         this.renderUI();
         await this.cargarReportes();
@@ -513,6 +548,9 @@ export default {
       if (fi > ff) return toast.warning('La fecha inicio debe ser anterior a la fecha fin');
       this.state.fecha_inicio = fi;
       this.state.fecha_fin    = ff;
+      this.state.pagina_ventas = 1;
+      this.state.pagina_productos = 1;
+      this.state.pagina_clientes = 1;
       this.state.cargando     = true;
       this.renderUI();
       await this.cargarReportes();
