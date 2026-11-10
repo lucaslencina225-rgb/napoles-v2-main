@@ -82,7 +82,7 @@ export default {
       transferencia: "background:#2e1065;color:#e9d5ff;",
     };
     const style = map[medio] || "background:#374151;color:#e5e7eb;";
-    return `<span style="${style}padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">${medio || "â€”"}</span>`;
+    return `<span style="${style}padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">${medio || "—"}</span>`;
   },
 
   _badgeEstado(estado) {
@@ -94,10 +94,10 @@ export default {
       entregada:  "background:#1e3a5f;color:#bfdbfe;",
     };
     const style = map[estado] || "background:#374151;color:#e5e7eb;";
-    return `<span style="${style}padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">${estado || "â€”"}</span>`;
+    return `<span style="${style}padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">${estado || "—"}</span>`;
   },
 
-  // â”€â”€â”€ Render UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─── Render UI ──────────────────────────────────────────────────────────
   renderUI() {
     const tabs = [
       { id: "ventas",    label: "Ventas",    icon: "fa-chart-line" },
@@ -114,9 +114,9 @@ export default {
             <i class="fas fa-chart-bar mr-2 text-blue-600"></i>Reportes
           </h2>
 
-          <!-- Presets rÃ¡pidos de fecha -->
+          <!-- Presets rápidos de fecha -->
           <div class="flex flex-wrap items-center gap-2 mb-3">
-            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 mr-1"><i class="fas fa-filter mr-1"></i>PerÃ­odo rÃ¡pido:</span>
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 mr-1"><i class="fas fa-filter mr-1"></i>Período rápido:</span>
             <button type="button" data-preset="todo" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200 dark:hover:bg-blue-900/60 transition">
               <i class="fas fa-history mr-1"></i>Todo el Historial
             </button>
@@ -130,7 +130,7 @@ export default {
               Este Mes
             </button>
             <button type="button" data-preset="ultimos_30" class="btn-preset px-2.5 py-1 text-xs font-medium rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition">
-              Ãšltimos 30 dÃ­as
+              Últimos 30 días
             </button>
           </div>
 
@@ -159,7 +159,7 @@ export default {
             </div>
           </div>
 
-          <!-- Resumen Mensual HistÃ³rico -->
+          <!-- Resumen Mensual Histórico -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
             <div class="p-3.5 rounded-lg border border-purple-200 dark:border-purple-800/60 bg-purple-50/70 dark:bg-purple-950/20">
               <div class="flex justify-between items-center mb-1">
@@ -167,7 +167,7 @@ export default {
                 <span class="text-xs px-2 py-0.5 rounded-full bg-purple-200 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 font-bold">233 vtas</span>
               </div>
               <div class="text-xl font-extrabold text-purple-900 dark:text-purple-100">$2.921.000</div>
-              <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">24 cajas cerradas â€¢ 147 clientes</div>
+              <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">24 cajas cerradas • 147 clientes</div>
             </div>
             <div class="p-3.5 rounded-lg border border-indigo-200 dark:border-indigo-800/60 bg-indigo-50/70 dark:bg-indigo-950/20">
               <div class="flex justify-between items-center mb-1">
@@ -175,7 +175,7 @@ export default {
                 <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200 font-bold">196 vtas</span>
               </div>
               <div class="text-xl font-extrabold text-indigo-900 dark:text-indigo-100">$2.586.000</div>
-              <div class="text-xs text-indigo-600 dark:text-indigo-400 mt-1">23 cajas cerradas â€¢ 57 clientes</div>
+              <div class="text-xs text-indigo-600 dark:text-indigo-400 mt-1">23 cajas cerradas • 57 clientes</div>
             </div>
             <div class="p-3.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/70 dark:bg-emerald-950/20">
               <div class="flex justify-between items-center mb-1">
@@ -183,7 +183,7 @@ export default {
                 <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 font-bold">433 vtas</span>
               </div>
               <div class="text-xl font-extrabold text-emerald-900 dark:text-emerald-100">$5.557.000</div>
-              <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">48 cajas cerradas â€¢ 208 clientes</div>
+              <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">48 cajas cerradas • 208 clientes</div>
             </div>
           </div>
 
@@ -437,7 +437,7 @@ export default {
       const itemRows = bar.items && bar.items.length
         ? bar.items.map(it => `<tr>
             <td style="${s.td}">${it.producto_nombre}</td>
-            <td style="${s.tdMono}">${it.sku || "â€”"}</td>
+            <td style="${s.tdMono}">${it.sku || "—"}</td>
             <td style="${s.tdC}font-weight:700;">${it.cantidad}</td>
             <td style="${s.tdR}color:${s.dark ? "#86efac" : "#15803d"};">${fmtMoney(it.subtotal)}</td>
           </tr>`).join("")
@@ -613,11 +613,11 @@ export default {
             <td ${tdS} style="font-family:monospace;font-size:11px;">${x.numero_ticket || x.id}</td>
             <td ${tdS}>${dateUtils.formatDate(x.fecha_venta)}</td>
             <td ${tdS}>${dateUtils.formatTime(x.fecha_venta)}</td>
-            <td ${tdS}>${x.cliente_nombre ? (x.cliente_nombre + " " + (x.cliente_apellido || "")).trim() : "â€”"}</td>
-            <td ${tdS}>${x.barbero_nombre ? (x.barbero_nombre + " " + (x.barbero_apellido || "")).trim() : "â€”"}</td>
-            <td ${tdCS}><span style="background:#f3f4f6;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;">${x.medio_pago || "â€”"}</span></td>
-            <td ${tdS}>${x.sucursal_nombre || "â€”"}</td>
-            <td ${tdS}>${x.estado || "â€”"}</td>
+            <td ${tdS}>${x.cliente_nombre ? (x.cliente_nombre + " " + (x.cliente_apellido || "")).trim() : "—"}</td>
+            <td ${tdS}>${x.barbero_nombre ? (x.barbero_nombre + " " + (x.barbero_apellido || "")).trim() : "—"}</td>
+            <td ${tdCS}><span style="background:#f3f4f6;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;">${x.medio_pago || "—"}</span></td>
+            <td ${tdS}>${x.sucursal_nombre || "—"}</td>
+            <td ${tdS}>${x.estado || "—"}</td>
             <td ${tdRS}>${fmtMoney(x.total)}</td>
           </tr>`).join("") || `<tr><td colspan="9" style="padding:16px;text-align:center;color:#9ca3af;">Sin ventas</td></tr>`}
           </tbody>
@@ -637,7 +637,7 @@ export default {
             <th ${thCS}>Unidades</th><th ${thRS}>Facturado</th>
           </tr></thead>
           <tbody>${p.map(x => `<tr>
-            <td ${tdS} style="font-family:monospace;font-size:11px;">${x.sku || "â€”"}</td>
+            <td ${tdS} style="font-family:monospace;font-size:11px;">${x.sku || "—"}</td>
             <td ${tdS}>${x.nombre}</td>
             <td ${tdCS} style="font-weight:700;">${x.cantidad_vendida}</td>
             <td ${tdRS}>${fmtMoney(x.total_facturado)}</td>
@@ -677,7 +677,7 @@ export default {
         const rows = bar.items && bar.items.length
           ? bar.items.map(it => `<tr>
               <td ${tdS}>${it.producto_nombre}</td>
-              <td ${tdS} style="font-family:monospace;font-size:11px;">${it.sku || "â€”"}</td>
+              <td ${tdS} style="font-family:monospace;font-size:11px;">${it.sku || "—"}</td>
               <td ${tdCS} style="font-weight:700;">${it.cantidad}</td>
               <td ${tdRS} style="color:#15803d;">${fmtMoney(it.subtotal)}</td>
             </tr>`).join("") +
