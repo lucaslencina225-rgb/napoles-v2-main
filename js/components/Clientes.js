@@ -75,58 +75,126 @@ export default {
     const rows = this.state.clientes
       .filter(row => searchText(`${row.nombre} ${row.apellido || ''} ${row.telefono || ''} ${row.email || ''} ${row.codigo_barbero || row.id}`).includes(searchText(this.state.busqueda)))
       .map(c => `
-        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-          <td class="p-2 border-t border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">${this.esc(c.id)}</td>
-          <td class="p-2 border-t border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">${this.esc(c.nombre)} ${this.esc(c.apellido)}</td>
-          <td class="p-2 border-t border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">${this.esc(c.telefono||'')}</td>
-          <td class="p-2 border-t border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">${this.esc(c.email||'')}</td>
-          <td class="p-2 border-t border-gray-200 dark:border-gray-700" data-sort-value="${this.esc(c.creado_en || '')}">${this.formatFechaHora(c.creado_en)}</td>
-          <td class="p-2 border-t border-gray-200 dark:border-gray-700 text-right">
-            <button class="btn-ver text-xs px-2 py-1 bg-blue-500 text-white rounded" data-id="${c.id}">Ver</button>
-            <button class="btn-editar text-xs px-2 py-1 bg-indigo-500 text-white rounded ml-2" data-id="${c.id}">Editar</button>
-            <button class="btn-eliminar text-xs px-2 py-1 bg-red-500 text-white rounded ml-2" data-id="${c.id}">Eliminar</button>
+        <tr class="hover:bg-blue-50/50 dark:hover:bg-gray-700/50 transition">
+          <td class="px-4 py-3.5 border-t border-gray-100 dark:border-gray-700 font-mono text-xs text-gray-500 dark:text-gray-400">#${this.esc(c.id)}</td>
+          <td class="px-4 py-3.5 border-t border-gray-100 dark:border-gray-700 font-semibold text-gray-900 dark:text-gray-100">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 flex items-center justify-center text-xs font-bold uppercase">
+                ${(c.nombre || "C").charAt(0)}
+              </span>
+              <span>${this.esc(c.nombre)} ${this.esc(c.apellido)}</span>
+            </div>
+          </td>
+          <td class="px-4 py-3.5 border-t border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300">
+            ${c.telefono ? `<span class="inline-flex items-center gap-1.5"><i class="fas fa-phone text-xs text-gray-400"></i>${this.esc(c.telefono)}</span>` : '<span class="text-gray-400 dark:text-gray-500 italic text-xs">Sin teléfono</span>'}
+          </td>
+          <td class="px-4 py-3.5 border-t border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs">
+            ${c.email ? `<span class="inline-flex items-center gap-1.5"><i class="fas fa-envelope text-xs text-gray-400"></i>${this.esc(c.email)}</span>` : '<span class="text-gray-400 dark:text-gray-500 italic text-xs">—</span>'}
+          </td>
+          <td class="px-4 py-3.5 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400" data-sort-value="${this.esc(c.creado_en || '')}">
+            <i class="fas fa-calendar-alt text-xs text-gray-400 mr-1"></i>${this.formatFechaHora(c.creado_en)}
+          </td>
+          <td class="px-4 py-3.5 border-t border-gray-100 dark:border-gray-700 text-right">
+            <div class="inline-flex items-center justify-end gap-1.5">
+              <button class="btn-ver inline-flex items-center gap-1 text-xs px-2.5 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 font-medium rounded-lg transition" data-id="${c.id}" title="Ver historial y puntos">
+                <i class="fas fa-eye text-xs"></i>Ver
+              </button>
+              <button class="btn-editar inline-flex items-center gap-1 text-xs px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 font-medium rounded-lg transition" data-id="${c.id}" title="Editar cliente">
+                <i class="fas fa-pen text-xs"></i>Editar
+              </button>
+              <button class="btn-eliminar inline-flex items-center gap-1 text-xs px-2 py-1.5 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 font-medium rounded-lg transition" data-id="${c.id}" title="Eliminar cliente">
+                <i class="fas fa-trash-alt text-xs"></i>
+              </button>
+            </div>
           </td>
         </tr>
       `).join('');
 
+    const totalClientes = this.state.clientes.length;
+    const filtradosCount = this.state.clientes.filter(row => searchText(`${row.nombre} ${row.apellido || ''} ${row.telefono || ''} ${row.email || ''} ${row.codigo_barbero || row.id}`).includes(searchText(this.state.busqueda))).length;
+
     this.container.innerHTML = `
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
+      <div class="space-y-5">
+        <!-- Header Principal -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Clientes</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Gestión de clientes y su historial de consumos</p>
-          </div>
-          <div class="flex flex-col lg:flex-row lg:items-end gap-2">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <input id="clientesBuscar" placeholder="Buscar por nombre o teléfono" class="px-3 py-2 rounded border" value="${this.esc(this.state.busqueda)}" />
-              <div class="flex gap-2">
-                <input id="fechaInicio" type="date" class="w-full px-3 py-2 rounded border" value="${this.esc(this.state.filtro_fecha_inicio)}" />
-                <input id="fechaFin" type="date" class="w-full px-3 py-2 rounded border" value="${this.esc(this.state.filtro_fecha_fin)}" />
-              </div>
+            <div class="flex items-center gap-3">
+              <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white">Clientes</h1>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
+                ${totalClientes} registrados
+              </span>
             </div>
-            <div class="flex gap-2">
-              <button id="btnFiltrarFechas" class="px-3 py-2 bg-blue-600 text-white rounded">Filtrar fechas</button>
-              <button id="btnNuevoCliente" class="px-3 py-2 bg-green-600 text-white rounded">Nuevo cliente</button>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Directorio de clientes, consumos y puntos de fidelización</p>
+          </div>
+          <div>
+            <button id="btnNuevoCliente" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl text-sm font-semibold shadow-sm hover:shadow transition duration-150">
+              <i class="fas fa-user-plus"></i>
+              <span>Nuevo Cliente</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Barra de Búsqueda y Filtros Ordenada -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="relative flex-1 min-w-[280px]">
+              <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"></i>
+              <input id="clientesBuscar" placeholder="Buscar por nombre, apellido, teléfono o email..."
+                class="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-700 transition"
+                value="${this.esc(this.state.busqueda)}" />
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg p-1">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2">Fechas:</span>
+                <input id="fechaInicio" type="date" title="Fecha inicio"
+                  class="px-2 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  value="${this.esc(this.state.filtro_fecha_inicio)}" />
+                <span class="text-gray-400 text-xs">a</span>
+                <input id="fechaFin" type="date" title="Fecha fin"
+                  class="px-2 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  value="${this.esc(this.state.filtro_fecha_fin)}" />
+                <button id="btnFiltrarFechas" class="px-3 py-1 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded transition">
+                  <i class="fas fa-filter mr-1"></i>Filtrar
+                </button>
+              </div>
+
+              ${this.state.busqueda ? `
+                <span class="text-xs text-gray-500 dark:text-gray-400 px-2">
+                  Mostrando <strong class="text-gray-900 dark:text-white">${filtradosCount}</strong> resultado${filtradosCount === 1 ? '' : 's'}
+                </span>
+              ` : ''}
             </div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left bg-gray-50 dark:bg-gray-700">
-                <th class="p-2 text-gray-700 dark:text-gray-200">ID</th>
-                <th class="p-2 text-gray-700 dark:text-gray-200">Nombre</th>
-                <th class="p-2 text-gray-700 dark:text-gray-200">Teléfono</th>
-                <th class="p-2 text-gray-700 dark:text-gray-200">Email</th>
-                <th class="p-2 text-gray-700 dark:text-gray-200">Agregado</th>
-                <th class="p-2 text-gray-700 dark:text-gray-200">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows || '<tr><td class="p-4 text-gray-500 dark:text-gray-400" colspan="6">No hay clientes</td></tr>'}
-            </tbody>
-          </table>
+        <!-- Tabla de Clientes con Diseño Prolijo -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50/80 dark:bg-gray-700/60 border-b border-gray-200 dark:border-gray-700">
+                <tr class="text-left text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                  <th class="px-4 py-3.5">ID</th>
+                  <th class="px-4 py-3.5">Cliente</th>
+                  <th class="px-4 py-3.5">Teléfono</th>
+                  <th class="px-4 py-3.5">Email</th>
+                  <th class="px-4 py-3.5">Registrado</th>
+                  <th class="px-4 py-3.5 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100 dark:divide-gray-700/60">
+                ${rows || `
+                  <tr>
+                    <td class="px-6 py-12 text-center text-gray-500 dark:text-gray-400" colspan="6">
+                      <i class="fas fa-users-slash text-3xl mb-2 text-gray-400 block"></i>
+                      <p class="font-medium">No se encontraron clientes</p>
+                      <p class="text-xs text-gray-400 mt-1">Prueba cambiando el criterio de búsqueda o agrega un nuevo cliente</p>
+                    </td>
+                  </tr>
+                `}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div id="modalCliente" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-2 sm:p-4" style="backdrop-filter: blur(2px);">
