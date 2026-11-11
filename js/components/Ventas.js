@@ -98,6 +98,25 @@ export default {
     this.state.caja_actual = await CierreCajaUtils.verificarCajaAbierta();
   },
 
+  seleccionarCliente(cliente) {
+    if (!cliente) {
+      this.state.cliente_seleccionado = null;
+      this.state.busqueda_cliente = '';
+    } else {
+      this.state.cliente_seleccionado = cliente.id;
+      this.state.busqueda_cliente = `${cliente.nombre} ${cliente.apellido || ''}`.trim();
+    }
+    this.renderUI();
+    this.attachEvents();
+  },
+
+  obtenerNombreClienteSeleccionado() {
+    if (!this.state.cliente_seleccionado) return 'Consumidor Final';
+    const c = this.state.clientes.find(cli => cli.id === this.state.cliente_seleccionado);
+    if (!c) return 'Consumidor Final';
+    return `${c.nombre} ${c.apellido || ''}${c.telefono ? ' · ' + c.telefono : ''}`.trim();
+  },
+
   renderUI() {
     this.container.innerHTML = `
       <div class="space-y-6">
@@ -181,16 +200,39 @@ export default {
                   <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                     <i class="fas fa-user"></i> Cliente
                   </h3>
-                  <button id="btnNuevoClienteVentas" class="px-3 py-1 rounded text-xs bg-green-600 text-white hover:bg-green-700 transition">
-                    <i class="fas fa-plus"></i> Nuevo
+                  <button id="btnNuevoClienteVentas" class="px-3 py-1 rounded text-xs bg-green-600 text-white hover:bg-green-700 transition font-semibold">
+                    <i class="fas fa-plus mr-1"></i>Nuevo
                   </button>
                 </div>
                 
-                <input id="buscarClienteVenta" type="search" aria-label="Buscar cliente por nombre o teléfono" placeholder="Buscar cliente por nombre o teléfono" value="${this.esc(this.state.busqueda_cliente)}" class="w-full px-3 py-2 mb-2 rounded-lg border dark:bg-gray-700" />
-                <select id="clienteSeleccionar" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <div class="relative mb-2">
+                  <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+                    <input id="buscarClienteVenta" type="search" autocomplete="off" aria-label="Buscar cliente por nombre o teléfono" placeholder="Escribe el nombre o teléfono del cliente..." value="${this.esc(this.state.busqueda_cliente)}" class="w-full pl-9 pr-8 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    ${this.state.cliente_seleccionado || this.state.busqueda_cliente ? `
+                      <button id="btnLimpiarCliente" type="button" title="Quitar cliente (Consumidor Final)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xs px-1">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    ` : ''}
+                  </div>
+
+                  <!-- Menú de Sugerencias de Autocompletado -->
+                  <div id="sugerenciasClientes" class="hidden absolute left-0 right-0 top-full mt-1 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-2xl max-h-60 overflow-y-auto"></div>
+                </div>
+
+                <select id="clienteSeleccionar" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm">
                   <option value="">Consumidor Final</option>
                   ${this.opcionesClientes()}
                 </select>
+
+                ${this.state.cliente_seleccionado ? `
+                  <div class="mt-2.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center justify-between text-xs text-blue-700 dark:text-blue-300">
+                    <span class="flex items-center gap-1.5 font-medium truncate">
+                      <i class="fas fa-check-circle text-blue-600 dark:text-blue-400"></i>
+                      <span>Cliente: <strong>${this.esc(this.obtenerNombreClienteSeleccionado())}</strong></span>
+                    </span>
+                  </div>
+                ` : ''}
               </div>
 
               <!-- BARBERO -->
@@ -738,15 +780,104 @@ export default {
       });
     });
 
-    document.getElementById('buscarClienteVenta')?.addEventListener('input', e => {
+    // Autocompletado de Cliente en Ventas
+    const inputBuscarCliente = document.getElementById('buscarClienteVenta');
+    const contenedorSugerencias = document.getElementById('sugerenciasClientes');
+    const selectCliente = document.getElementById('clienteSeleccionar');
+
+    const renderizarSugerencias = (texto) => {
+      if (!contenedorSugerencias) return;
+      const q = searchText(texto);
+      if (!q) {
+        contenedorSugerencias.classList.add('hidden');
+        contenedorSugerencias.innerHTML = '';
+        return;
+      }
+
+      const matches = this.state.clientes.filter(c => {
+        const full = searchText(`${c.nombre} ${c.apellido || ''} ${c.telefono || ''} ${c.documento_numero || ''} ${c.email || ''}`);
+        return full.includes(q);
+      }).slice(0, 10);
+
+      if (matches.length === 0) {
+        contenedorSugerencias.innerHTML = `
+          <div class="px-3 py-3 text-center text-xs text-gray-500 dark:text-gray-400">
+            <i class="fas fa-search mr-1 text-gray-400"></i> No se encontraron clientes con "<strong>${this.esc(texto)}</strong>"
+          </div>`;
+      } else {
+        contenedorSugerencias.innerHTML = matches.map(c => `
+          <div data-cliente-id="${c.id}" class="sugerencia-cliente-item px-3 py-2.5 hover:bg-blue-50 dark:hover:bg-gray-700/80 cursor-pointer border-b border-gray-100 dark:border-gray-700/60 last:border-b-0 flex items-center justify-between transition">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-7 h-7 shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 flex items-center justify-center text-xs font-bold uppercase">
+                ${(c.nombre || 'C').charAt(0)}
+              </span>
+              <div class="min-w-0">
+                <p class="text-xs font-bold text-gray-900 dark:text-white truncate">
+                  ${this.esc(c.nombre)} ${this.esc(c.apellido || '')}
+                </p>
+                <p class="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+                  ${c.telefono ? `<i class="fas fa-phone text-[9px] mr-1"></i>${this.esc(c.telefono)}` : 'Sin teléfono'}
+                  ${c.email ? ` · ${this.esc(c.email)}` : ''}
+                </p>
+              </div>
+            </div>
+            <span class="shrink-0 text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/40 px-2 py-0.5 rounded ml-2">
+              Seleccionar
+            </span>
+          </div>
+        `).join('');
+
+        contenedorSugerencias.querySelectorAll('.sugerencia-cliente-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const id = parseInt(item.dataset.clienteId, 10);
+            const cli = this.state.clientes.find(c => c.id === id);
+            if (cli) {
+              this.seleccionarCliente(cli);
+            }
+          });
+        });
+      }
+
+      contenedorSugerencias.classList.remove('hidden');
+    };
+
+    inputBuscarCliente?.addEventListener('input', e => {
       this.state.busqueda_cliente = e.target.value;
-      const select = document.getElementById('clienteSeleccionar');
-      select.innerHTML = '<option value="">Consumidor Final</option>' + this.opcionesClientes();
+      if (selectCliente) {
+        selectCliente.innerHTML = '<option value="">Consumidor Final</option>' + this.opcionesClientes();
+      }
+      renderizarSugerencias(e.target.value);
+    });
+
+    inputBuscarCliente?.addEventListener('focus', () => {
+      if (inputBuscarCliente.value.trim()) {
+        renderizarSugerencias(inputBuscarCliente.value);
+      }
+    });
+
+    // Cerrar sugerencias al hacer click fuera
+    this._docClienteClickHandler ??= (e) => {
+      if (!e.target.closest('#buscarClienteVenta') && !e.target.closest('#sugerenciasClientes')) {
+        document.getElementById('sugerenciasClientes')?.classList.add('hidden');
+      }
+    };
+    document.removeEventListener('click', this._docClienteClickHandler);
+    document.addEventListener('click', this._docClienteClickHandler);
+
+    // Botón Limpiar Cliente
+    document.getElementById('btnLimpiarCliente')?.addEventListener('click', () => {
+      this.seleccionarCliente(null);
     });
 
     // Cliente
-    document.getElementById('clienteSeleccionar')?.addEventListener('change', (e) => {
-      this.state.cliente_seleccionado = e.target.value ? parseInt(e.target.value) : null;
+    selectCliente?.addEventListener('change', (e) => {
+      const id = e.target.value ? parseInt(e.target.value) : null;
+      if (id) {
+        const cli = this.state.clientes.find(c => c.id === id);
+        this.seleccionarCliente(cli || null);
+      } else {
+        this.seleccionarCliente(null);
+      }
     });
 
     // Barbero
